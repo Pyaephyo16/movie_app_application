@@ -16,9 +16,8 @@ part 'movie_vo.g.dart';
 ///To store in Hive,use bool type var for each section.
 
 @JsonSerializable()
-@HiveType(typeId: HIVE_TYPE_ID_MOVIE_VO,adapterName: "MovieVOAdapter")
-class MovieVO{
-
+@HiveType(typeId: HIVE_TYPE_ID_MOVIE_VO, adapterName: "MovieVOAdapter")
+class MovieVO {
   @JsonKey(name: "adult")
   @HiveField(0)
   bool? adult;
@@ -132,7 +131,6 @@ class MovieVO{
   @HiveField(29)
   bool? isTopRated;
 
-
   MovieVO(
       this.adult,
       this.backDropPath,
@@ -164,33 +162,37 @@ class MovieVO{
       this.isPopular,
       this.isTopRated);
 
-
   //json to object
-  factory MovieVO.fromJson(Map<String,dynamic> json) => _$MovieVOFormJson(json);
+  factory MovieVO.fromJson(Map<String, dynamic> json) =>
+      _$MovieVOFormJson(json);
 
   //object to json
-  Map<String,dynamic> toJson() => _$MovieVOToJson(this);
+  Map<String, dynamic> toJson() => _$MovieVOToJson(this);
 
-  String getRuntimeString(int runTime){
-     late String hour;
-     late String minute;
+  String getRuntimeString(int runTime) {
+    late String hour;
+    late String minute;
 
-      hour = (runTime/60).toStringAsFixed(0);
-      minute = (runTime%60).toString();
+    hour = (runTime / 60).toStringAsFixed(0);
+    minute = (runTime % 60).toString();
 
-      return "${hour}hr ${minute}min";
+    return "${hour}hr ${minute}min";
   }
 
-  List<String> getGenreListAsStringList(){
+  List<String> getGenreListAsStringList() {
     return genres?.map((genre) => genre.name ?? "").toList() ?? [];
   }
 
-  String getGenreListAsCommaSeparatedString(){
-      return genres?.map((genre) => genre.name ?? "").toList().join(",") ?? "";
+  String getGenreListAsCommaSeparatedString() {
+    return genres?.map((genre) => genre.name ?? "").toList().join(",") ?? "";
   }
 
-  String getProductionCountriesAsCommaSeparatedString(){
-    return productionCountries?.map((country) => country.name ?? "" ).toList().join(",") ?? "";
+  String getProductionCountriesAsCommaSeparatedString() {
+    return productionCountries
+            ?.map((country) => country.name ?? "")
+            .toList()
+            .join(",") ??
+        "";
   }
 
   //VO mr pr tat properties twy a twt string t ku return pyn
@@ -199,5 +201,4 @@ class MovieVO{
   String toString() {
     return 'MovieVO{adult: $adult, backDropPath: $backDropPath, genreIds: $genreIds, id: $id, originalLanguage: $originalLanguage, originalTitle: $originalTitle, overView: $overView, popularity: $popularity, posterPath: $posterPath, releaseDate: $releaseDate, title: $title, video: $video, voteAverage: $voteAverage, voteCount: $voteCount}';
   }
-
 }

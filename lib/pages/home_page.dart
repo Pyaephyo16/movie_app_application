@@ -41,56 +41,56 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     ///Now Playing Movies
-    movieModel.getNowPlayingMovies().then((movieList) {
-      setState(() {
-        nowPlayingMovies = movieList;
-      });
-    }).catchError((error) {
-      debugPrint(error.toString());
-    });
+    // movieModel.getNowPlayingMovies().then((movieList) {
+    //   setState(() {
+    //     nowPlayingMovies = movieList;
+    //   });
+    // }).catchError((error) {
+    //   debugPrint(error.toString());
+    // });
 
     ///Now Playing Movies Database
-    movieModel.getNowPlayingMoviesFromDatabase().then((movieList){
+    movieModel.getNowPlayingMoviesFromDatabase().listen((movieList){
       setState(() {
         nowPlayingMovies = movieList;
       });
-    }).catchError((error){
+    }).onError((error){
       debugPrint(error.toString());
     });
 
     ///Popular Movies
-    movieModel.getPopularMovies().then((movieList) {
-      setState(() {
-        popularMovies = movieList;
-      });
-    }).catchError((error) {
-      debugPrint(error.toString());
-    });
+    // movieModel.getPopularMovies().then((movieList) {
+    //   setState(() {
+    //     popularMovies = movieList;
+    //   });
+    // }).catchError((error) {
+    //   debugPrint(error.toString());
+    // });
 
     ///Popular Movies Database
-    movieModel.getPopularMoviesFromDatabase().then((movieList){
+    movieModel.getPopularMoviesFromDatabase().listen((movieList){
       setState(() {
         popularMovies = movieList;
       });
-    }).catchError((error){
+    }).onError((error){
       debugPrint(error.toString());
     });
 
     ///Top Rated Movies
-    movieModel.getNowPlayingMovies().then((movieList) {
-      setState(() {
-        topRatedMovies = movieList;
-      });
-    }).catchError((error) {
-      debugPrint(error.toString());
-    });
+    // movieModel.getNowPlayingMovies().then((movieList) {
+    //   setState(() {
+    //     topRatedMovies = movieList;
+    //   });
+    // }).catchError((error) {
+    //   debugPrint(error.toString());
+    // });
 
     ///Top Rated Movies Database
-    movieModel.getTopRatedMoviesFromDatabase().then((movieList){
+    movieModel.getTopRatedMoviesFromDatabase().listen((movieList){
       setState(() {
         topRatedMovies = movieList;
       });
-    }).catchError((error){
+    }).onError((error){
       debugPrint(error.toString());
     });
 
@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               BannerSectionView(
-                movieList: popularMovies?.take(5).toList(),
+                movieList: popularMovies?.take(5).toList() ?? [],
               ),
               SizedBox(
                 height: MARGIN_LARGE,
@@ -468,7 +468,7 @@ class _BannerSectionViewState extends State<BannerSectionView> {
           height: MARGIN_MEDIUM_2,
         ),
         DotsIndicator(
-          dotsCount: widget.movieList?.length ?? 1,
+          dotsCount: (widget.movieList?.length ==0)? 1 : widget.movieList?.length ?? 1,
           position: _position,
           decorator: DotsDecorator(
             color: HOME_SCREEN_BANNER_DOTS_INACTIVE_COLOR,
