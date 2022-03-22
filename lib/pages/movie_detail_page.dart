@@ -12,6 +12,7 @@ import 'package:movie_app/resources/strings.dart';
 import 'package:movie_app/widgets/actors_and_creators_section_view.dart';
 import 'package:movie_app/widgets/gradient_view.dart';
 import 'package:movie_app/widgets/rating_view.dart';
+import 'package:movie_app/widgets/title_and_horizontal_movie_list_view.dart';
 import 'package:movie_app/widgets/title_text.dart';
 import 'package:provider/provider.dart';
 
@@ -125,7 +126,18 @@ class MovieDetailPage extends StatelessWidget {
                         actors: creatorList,
                       ) : Container();
                        }
-                    ) 
+                    ),
+                    SizedBox(height: MARGIN_LARGE,),
+                    Selector<MovieDetailBloc,List<MovieVO>?>(
+                      selector: (context,bloc) => bloc.mRelatedMovies,
+                      builder: (context,relatedMovies,child) =>
+                       TitleAndHorizontalMovieListView(
+                        (movieId) => _navigateToMovieDetailScreen(context, movieId),
+                      nowPlayingMovies: relatedMovies,
+                      title: MOVIE_DETAILS_SCREEN_RELATED_MOVIES,
+                      ),
+                    ),
+                    SizedBox(height: MARGIN_LARGE,),
                   ]),
                 ),
               ],
@@ -135,6 +147,20 @@ class MovieDetailPage extends StatelessWidget {
       ),
     );
   }
+
+ void _navigateToMovieDetailScreen(BuildContext context, int? movieId) {
+    if (movieId != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MovieDetailPage(
+            movieId: movieId,
+          ),
+        ),
+      );
+    }
+  }
+
 }
 
 class AboutFilmSectionView extends StatelessWidget {
