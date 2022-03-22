@@ -131,6 +131,8 @@ class MovieVO {
   @HiveField(29)
   bool? isTopRated;
 
+  MovieVO.emptySituation();
+
   MovieVO(
       this.adult,
       this.backDropPath,

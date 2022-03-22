@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/blocs/movie_detail_bloc.dart';
 import 'package:movie_app/data/data.vos/actor_vo.dart';
 import 'package:movie_app/data/data.vos/movie_vo.dart';
 import 'package:movie_app/data/models/movie_model.dart';
@@ -12,111 +13,124 @@ import 'package:movie_app/widgets/actors_and_creators_section_view.dart';
 import 'package:movie_app/widgets/gradient_view.dart';
 import 'package:movie_app/widgets/rating_view.dart';
 import 'package:movie_app/widgets/title_text.dart';
+import 'package:provider/provider.dart';
 
-class MovieDetailPage extends StatefulWidget {
+class MovieDetailPage extends StatelessWidget {
 
   final int movieId;
 
   MovieDetailPage({required this.movieId});
 
-  @override
-  State<MovieDetailPage> createState() => _MovieDetailPageState();
-}
-
-class _MovieDetailPageState extends State<MovieDetailPage> {
-
-
-  ///Model
-  MovieModel _movieModel = MovieModelImpl();
-
-  ///State Variables
-  MovieVO? movieDetails;
-  List<ActorVO>? cast;
-  List<ActorVO>? crew;
-
-  @override
-  void initState() {
-    ///MovieDetails
-    _movieModel.getMovieDetails(widget.movieId)
-    .then((movieDetails){
-      setState(() {
-        this.movieDetails = movieDetails;
-      });
-    }).catchError((error){
-      debugPrint("Movie Details Api Error ============> ${error.toString()}");
-    });
-
-    ///Movie Details Database
-    _movieModel.getMovieDetailsFromDatabase(widget.movieId).then((movieDetails){
-      setState(() {
-        this.movieDetails = movieDetails;
-      });
-    });
-
-    ///CreditsByMovie
-    _movieModel.getCreditsByMovie(widget.movieId)
-    .then((castAndCrew){
-      setState(() {
-        this.cast = castAndCrew.first;
-        this.crew = castAndCrew[1];
-      });
-    }).catchError((error){
-      debugPrint(error.toString());
-    });
-
-    super.initState();
-  }
+  // ///Model
+  // MovieModel _movieModel = MovieModelImpl();
+  // ///State Variables
+  // MovieVO? movieDetails;
+  // List<ActorVO>? cast;
+  // List<ActorVO>? crew;
+  // @override
+  // void initState() {
+  //   ///MovieDetails
+  //   _movieModel.getMovieDetails(widget.movieId)
+  //   .then((movieDetails){
+  //     setState(() {
+  //       this.movieDetails = movieDetails;
+  //     });
+  //   }).catchError((error){
+  //     debugPrint("Movie Details Api Error ============> ${error.toString()}");
+  //   });
+  //   ///Movie Details Database
+  //   _movieModel.getMovieDetailsFromDatabase(widget.movieId).then((movieDetails){
+  //     setState(() {
+  //       this.movieDetails = movieDetails;
+  //     });
+  //   });
+  //   ///CreditsByMovie
+  //   _movieModel.getCreditsByMovie(widget.movieId)
+  //   .then((castAndCrew){
+  //     setState(() {
+  //       this.cast = castAndCrew.first;
+  //       this.crew = castAndCrew[1];
+  //     });
+  //   }).catchError((error){
+  //     debugPrint(error.toString());
+  //   });
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        color: HOME_SCREEN_BACKGROUND_COLOR,
-        child: CustomScrollView(
-          slivers: [
-            MovieDetailSliverAppBarView(
-              () => Navigator.pop(context),
-              movie: this.movieDetails,
+    return ChangeNotifierProvider(
+      create: (context) => MovieDetailBloc(movieId),
+      child: Scaffold(
+        body: Selector<MovieDetailBloc,MovieVO>(
+          selector: (context,bloc) => bloc.movieDetails ?? MovieVO.emptySituation(),
+          builder: (context, movie, child) => 
+           Container(
+            color: HOME_SCREEN_BACKGROUND_COLOR,
+            child: CustomScrollView(
+              slivers: [
+                MovieDetailSliverAppBarView(
+                  () => Navigator.pop(context),
+                 //movie: this.movieDetails,
+                 movie: movie,
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                      child: TrailerSection(
+                        // runTime: movieDetails?.getRuntimeString(movieDetails?.runTime ?? 0) ?? "",
+                        // genreList: movieDetails?.getGenreListAsStringList() ?? [],
+                        // storyLine : movieDetails?.overView ?? "",
+                        runTime: movie.getRuntimeString(movie.runTime ?? 0),
+                          genreList: movie.getGenreListAsStringList(),
+                          storyLine: movie.overView ?? "",
+                      ),
+                    ),
+                    SizedBox(
+                      height: MARGIN_LARGE,
+                    ),
+                    Selector<MovieDetailBloc,List<ActorVO>>(
+                      selector: (context,bloc) => bloc.cast ?? [],
+                      builder: (context,actorList,child) =>
+                       ActorsAndCreatorsSectionView(
+                        MOVIE_DETAILS_SCREEN_ACTORS_TITLE,
+                        "",
+                        seeMoreButtonVisibility: false,
+                        //actors: this.cast,
+                        actors: actorList,
+                      ),
+                    ),
+                    SizedBox(
+                      height: MARGIN_LARGE,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                      child: AboutFilmSectionView(
+                        //movieVO: movieDetails,
+                        movieVO: movie,
+                      ),
+                    ),
+                    SizedBox(
+                      height: MARGIN_LARGE,
+                    ),
+                    
+                     Selector<MovieDetailBloc,List<ActorVO>>(
+                       selector: (context,bloc) => bloc.crew ?? [],
+                       builder: (context,creatorList,child) {
+                    return  (creatorList !=null && creatorList.isNotEmpty) ? ActorsAndCreatorsSectionView(
+                        MOVIE_DETAILS_SCREEN_CREATORS_TITLE,
+                        MOVIE_DETAILS_SCREEN_CREATORS_SEE_MORE,
+                        //actors: this.crew,
+                        actors: creatorList,
+                      ) : Container();
+                       }
+                    ) 
+                  ]),
+                ),
+              ],
             ),
-            SliverList(
-              delegate: SliverChildListDelegate([
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                  child: TrailerSection(
-                    runTime: movieDetails?.getRuntimeString(movieDetails?.runTime ?? 0) ?? "",
-                    genreList: movieDetails?.getGenreListAsStringList() ?? [],
-                    storyLine : movieDetails?.overView ?? "",
-                  ),
-                ),
-                SizedBox(
-                  height: MARGIN_LARGE,
-                ),
-                ActorsAndCreatorsSectionView(
-                  MOVIE_DETAILS_SCREEN_ACTORS_TITLE,
-                  "",
-                  seeMoreButtonVisibility: false,
-                  actors: this.cast,
-                ),
-                SizedBox(
-                  height: MARGIN_LARGE,
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                  child: AboutFilmSectionView(
-                    movieVO: movieDetails,
-                  ),
-                ),
-                SizedBox(
-                  height: MARGIN_LARGE,
-                ),
-                ActorsAndCreatorsSectionView(
-                  MOVIE_DETAILS_SCREEN_CREATORS_TITLE,
-                  MOVIE_DETAILS_SCREEN_CREATORS_SEE_MORE,
-                  actors: this.crew,
-                ),
-              ]),
-            ),
-          ],
+          ),
         ),
       ),
     );
