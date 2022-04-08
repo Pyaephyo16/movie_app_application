@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+
 import 'package:movie_app/data/data.vos/movie_vo.dart';
 import 'package:movie_app/persistance/hive_constants.dart';
 
@@ -11,7 +13,7 @@ part 'actor_vo.g.dart';
 
 @JsonSerializable()
 @HiveType(typeId: HIVE_TYPE_ID_ACTOR_VO,adapterName: "ActorVOAdapter")
-class ActorVO{
+class ActorVO {
 
   @JsonKey(name: "adult")
   @HiveField(0)
@@ -80,4 +82,39 @@ class ActorVO{
   factory ActorVO.fromJson(Map<String,dynamic> json) => _$ActorVOFromJson(json);
 
   Map<String,dynamic> toJson() => _$ActorVOToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+  
+    return other is ActorVO &&
+      other.adult == adult &&
+      other.id == id &&
+      listEquals(other.knownFor, knownFor) &&
+      other.popularity == popularity &&
+      other.name == name &&
+      other.profilePath == profilePath &&
+      other.knownForDepartment == knownForDepartment &&
+      other.originalName == originalName &&
+      other.castId == castId &&
+      other.character == character &&
+      other.creditId == creditId &&
+      other.order == order;
+  }
+
+  @override
+  int get hashCode {
+    return adult.hashCode ^
+      id.hashCode ^
+      knownFor.hashCode ^
+      popularity.hashCode ^
+      name.hashCode ^
+      profilePath.hashCode ^
+      knownForDepartment.hashCode ^
+      originalName.hashCode ^
+      castId.hashCode ^
+      character.hashCode ^
+      creditId.hashCode ^
+      order.hashCode;
+  }
 }

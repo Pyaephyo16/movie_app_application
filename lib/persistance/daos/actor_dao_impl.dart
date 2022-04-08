@@ -1,17 +1,19 @@
 import 'package:movie_app/data/data.vos/actor_vo.dart';
 import 'package:hive/hive.dart';
+import 'package:movie_app/persistance/abstraction_layer/actor_dao.dart';
 import 'package:movie_app/persistance/hive_constants.dart';
 
-class ActorDao{
+class ActorDaoImpl extends ActorDao{
 
-static final ActorDao _singleton = ActorDao._internal();
+static final ActorDaoImpl _singleton = ActorDaoImpl._internal();
 
-factory ActorDao(){
+factory ActorDaoImpl(){
   return _singleton;
 }
 
-  ActorDao._internal();
+  ActorDaoImpl._internal();
 
+     @override
     void saveAllActors(List<ActorVO> actorList) async{
         Map<int,ActorVO> actorMap = Map.fromIterable(
           actorList,
@@ -21,6 +23,7 @@ factory ActorDao(){
           await getActorBox().putAll(actorMap);
     }
 
+     @override
     List<ActorVO> getAllActors(){
       return getActorBox().values.toList();
     }

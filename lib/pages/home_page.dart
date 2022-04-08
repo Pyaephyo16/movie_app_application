@@ -188,6 +188,10 @@ class HomePage extends StatelessWidget {
                     (movieId) => _navigateToMovieDetailScreen(context, movieId),
                     nowPlayingMovies: nowPlayingMoviesList,
                     title: MAIN_SCREEN_BEST_POPULAR_MOVIES_AND_SERIALS,
+                    onListEndReached: (){
+                      var _bloc = Provider.of<HomeBloc>(context,listen: false);
+                      _bloc.onNowPlayingMovieListEndReached();
+                    },
                   ),
                 ),
                 SizedBox(
@@ -310,6 +314,9 @@ class GenreSectionView extends StatelessWidget {
           child: HorizontalMovieListView(
             onTapMovie: (movieId) => this.onTapMovie(movieId),
             movieList: moviesByGenre,
+            onListEndReached: (){
+              
+            },
           ),
         ),
       ],

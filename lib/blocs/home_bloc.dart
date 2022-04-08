@@ -15,10 +15,20 @@ class HomeBloc extends ChangeNotifier{
   List<GenreVO>? genres;
   List<ActorVO>? actors;
 
-  ///Model 
-  MovieModel movieModel = MovieModelImpl();
+  ///Page
+  int pageForNowPlayingMovies = 1;
 
-  HomeBloc(){
+  ///Model 
+  MovieModel mMovieModel = MovieModelImpl();
+
+
+  HomeBloc({MovieModel? movieModel}){
+
+    if(movieModel != null){
+      ///Set Mock Model For Test Dao
+      mMovieModel = movieModel;
+    }
+    
 
       ///Now Playing Movies
     // movieModel.getNowPlayingMovies().then((movieList) {
@@ -30,7 +40,7 @@ class HomeBloc extends ChangeNotifier{
     // });
 
     ///Now Playing Movies Database
-    movieModel.getNowPlayingMoviesFromDatabase().listen((movieList){
+    mMovieModel.getNowPlayingMoviesFromDatabase().listen((movieList){
         nowPlayingMovies = movieList;
         notifyListeners();
     }).onError((error){
@@ -47,7 +57,7 @@ class HomeBloc extends ChangeNotifier{
     // });
 
     ///Popular Movies Database
-    movieModel.getPopularMoviesFromDatabase().listen((movieList){
+    mMovieModel.getPopularMoviesFromDatabase().listen((movieList){
         popularMovies = movieList;
       notifyListeners();
     }).onError((error){
@@ -64,7 +74,7 @@ class HomeBloc extends ChangeNotifier{
     // });
 
     ///Top Rated Movies Database
-    movieModel.getTopRatedMoviesFromDatabase().listen((movieList){
+    mMovieModel.getTopRatedMoviesFromDatabase().listen((movieList){
         topRatedMovies = movieList;
       notifyListeners();
     }).onError((error){
@@ -72,7 +82,7 @@ class HomeBloc extends ChangeNotifier{
     });
 
     ///Genres
-    movieModel.getGenres().then((genres) {
+    mMovieModel.getGenres().then((genres) {
         this.genres = genres;
         ///Movies By Genre
         _getMoviesByGenreAndRefresh(genres?.first.id ?? 0);
@@ -82,17 +92,19 @@ class HomeBloc extends ChangeNotifier{
     });
 
     ///Genres Database
-    movieModel.getGenresFromDatabase().then((genres){
+    mMovieModel.getGenresFromDatabase().then((genres){
         this.genres = genres;
         ///Movies By Genre Database
-        _getMoviesByGenreAndRefresh(genres?.first.id ?? 0);       
+        if(genres?.isNotEmpty ?? false){
+          _getMoviesByGenreAndRefresh(genres?.first.id ?? 0);
+        }       
 
     }).catchError((error){
       debugPrint(error.toString());
     });
 
     ///Actors
-    movieModel.getActors(1).then((actors) {
+    mMovieModel.getActors(1).then((actors) {
         this.actors = actors;
       notifyListeners();
     }).catchError((error) {
@@ -100,7 +112,7 @@ class HomeBloc extends ChangeNotifier{
     });
 
     ///Actors Database
-    movieModel.getActorsFromDatabase().then((actors){
+    mMovieModel.getActorsFromDatabase().then((actors){
         this.actors = actors;
       notifyListeners();
     }).catchError((error){
@@ -114,12 +126,17 @@ class HomeBloc extends ChangeNotifier{
     }
 
    void _getMoviesByGenreAndRefresh(int genreId){
-    movieModel.getMoviesByGenre(genreId).then((moviesByGenre){
+    mMovieModel.getMoviesByGenre(genreId).then((moviesByGenre){
         this.moviesByGenre = moviesByGenre;
       notifyListeners();
     }).catchError((error){
       debugPrint(error.toString());
     });
+  }
+
+  void onNowPlayingMovieListEndReached(){
+    this.pageForNowPlayingMovies += 1;
+    mMovieModel.getNowPlayingMovies(pageForNowPlayingMovies);
   }
   
 

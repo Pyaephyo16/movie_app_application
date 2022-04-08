@@ -1,27 +1,29 @@
 import 'package:movie_app/data/data.vos/genre_vo.dart';
 import 'package:hive/hive.dart';
+import 'package:movie_app/persistance/abstraction_layer/genre_dao.dart';
 import 'package:movie_app/persistance/hive_constants.dart';
 
-class GenreDao{
+class GenreDaoImpl extends GenreDao{
 
-static final GenreDao _singleton = GenreDao._internal();
+static final GenreDaoImpl _singleton = GenreDaoImpl._internal();
 
-factory GenreDao(){
+factory GenreDaoImpl(){
   return _singleton;
 }
 
-  GenreDao._internal();
+  GenreDaoImpl._internal();
 
+  @override
   void saveAllGenres(List<GenreVO> genreList)async{
     Map<int,GenreVO> genreMap = Map.fromIterable(
       genreList,
       key: (genre) => genre.id,
       value: (genre) => genre
     );
-
     await getGenreBox().putAll(genreMap);
   }
 
+ @override
   List<GenreVO> getAllGenres(){
     return getGenreBox().values.toList();
   }

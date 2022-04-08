@@ -94,13 +94,13 @@ class MovieDetailPage extends StatelessWidget {
                     Selector<MovieDetailBloc,List<ActorVO>>(
                       selector: (context,bloc) => bloc.cast ?? [],
                       builder: (context,actorList,child) =>
-                       ActorsAndCreatorsSectionView(
+                      (actorList !=null && actorList.isNotEmpty) ? ActorsAndCreatorsSectionView(
                         MOVIE_DETAILS_SCREEN_ACTORS_TITLE,
                         "",
                         seeMoreButtonVisibility: false,
                         //actors: this.cast,
                         actors: actorList,
-                      ),
+                      ) : Container(),
                     ),
                     SizedBox(
                       height: MARGIN_LARGE,
@@ -135,6 +135,8 @@ class MovieDetailPage extends StatelessWidget {
                         (movieId) => _navigateToMovieDetailScreen(context, movieId),
                       nowPlayingMovies: relatedMovies,
                       title: MOVIE_DETAILS_SCREEN_RELATED_MOVIES,
+                      onListEndReached: (){
+                      },
                       ),
                     ),
                     SizedBox(height: MARGIN_LARGE,),
@@ -466,7 +468,7 @@ class MovieDetailSliverAppBarView extends StatelessWidget {
         background: Stack(
           children: [
             Positioned.fill(
-              child: MovieDetailAppBarImageView(
+              child: (movie?.posterPath == null) ? Container() : MovieDetailAppBarImageView(
                 imageUrl: movie?.posterPath ?? "",
               ),
             ),

@@ -44,7 +44,7 @@ class ActorsAndCreatorsSectionView extends StatelessWidget {
               //   ActorView(),
               // ],
               children: actors?.map((actor){
-                return ActorView(actor: actor);
+                return (actor.profilePath == null) ? Container() : ActorView(actor: actor);
               }).toList() ?? [],
             ),
           ),

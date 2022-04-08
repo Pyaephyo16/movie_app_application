@@ -4,9 +4,12 @@ import 'package:movie_app/data/data.vos/movie_vo.dart';
 import 'package:movie_app/data/models/movie_model.dart';
 import 'package:movie_app/network/dataagents/movie_data_agents.dart';
 import 'package:movie_app/network/dataagents/retrofit_data_agents_impl.dart';
-import 'package:movie_app/persistance/daos/actor_dao.dart';
-import 'package:movie_app/persistance/daos/genre_dao.dart';
-import 'package:movie_app/persistance/daos/movie_dao.dart';
+import 'package:movie_app/persistance/abstraction_layer/actor_dao.dart';
+import 'package:movie_app/persistance/abstraction_layer/genre_dao.dart';
+import 'package:movie_app/persistance/abstraction_layer/movie_dao.dart';
+import 'package:movie_app/persistance/daos/actor_dao_impl.dart';
+import 'package:movie_app/persistance/daos/genre_dao_impl.dart';
+import 'package:movie_app/persistance/daos/movie_dao_impl.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 class MovieModelImpl extends MovieModel{
@@ -19,18 +22,31 @@ class MovieModelImpl extends MovieModel{
 
   MovieModelImpl._internal();
 
-  MovieDataAgent _dataAgent = RetrofitDataAgentImpl();
+  MovieDataAgent mDataAgent = RetrofitDataAgentImpl();
 
   ///Dao
-  MovieDao mMovieDao = MovieDao();
-  GenreDao mGenreDao = GenreDao();
-  ActorDao mActorDao = ActorDao();
+  MovieDao mMovieDao = MovieDaoImpl();
+  GenreDao mGenreDao = GenreDaoImpl();
+  ActorDao mActorDao = ActorDaoImpl();
+
+  ///For Testing Purpose
+  void setDaosAndDataAgents(
+    MovieDao movieDao,
+    ActorDao actorDao,
+    GenreDao genreDao,
+    MovieDataAgent dataAgent,
+    ){
+    mMovieDao = movieDao;
+    mGenreDao = genreDao;
+    mActorDao = actorDao;
+    mDataAgent = dataAgent;
+  }
 
 
   ///Network
   @override
   void getNowPlayingMovies(int page) {
-    _dataAgent.getNowPlayingMovies(page).then((movies){
+    mDataAgent.getNowPlayingMovies(page).then((movies){
         List<MovieVO> nowPlayingMovies = movies?.map((movie){
           movie.isNowPlaying = true;
           movie.isPopular = false;
@@ -44,7 +60,7 @@ class MovieModelImpl extends MovieModel{
 
   @override
   Future<List<ActorVO>?> getActors(int page) {
-    return _dataAgent.getActors(1).then((actors){
+    return mDataAgent.getActors(1).then((actors){
       mActorDao.saveAllActors(actors ?? []);
       return Future.value(actors);
     });
@@ -52,7 +68,7 @@ class MovieModelImpl extends MovieModel{
 
   @override
   Future<List<GenreVO>?> getGenres() {
-    return _dataAgent.getGenres().then((genres) {
+    return mDataAgent.getGenres().then((genres) {
         mGenreDao.saveAllGenres(genres ?? []);
         return Future.value(genres);
     });
@@ -60,12 +76,12 @@ class MovieModelImpl extends MovieModel{
 
   @override
   Future<List<MovieVO>?> getMoviesByGenre(int genreId) {
-    return _dataAgent.getMoviesByGenre(genreId);
+    return mDataAgent.getMoviesByGenre(genreId);
   }
 
   @override
   void getPopularMovies(int page) {
-     _dataAgent.getPopularMovies(page).then((movies){
+     mDataAgent.getPopularMovies(page).then((movies){
       List<MovieVO> popularMovies = movies?.map((movie){
           movie.isNowPlaying = false;
           movie.isPopular = true;
@@ -79,7 +95,7 @@ class MovieModelImpl extends MovieModel{
 
   @override
   void getTopRatedMovies(int page) {
-   _dataAgent.getTopRatedMovies(page).then((movies){
+   mDataAgent.getTopRatedMovies(page).then((movies){
         List<MovieVO> topRatedMovies = movies?.map((movie) {
           movie.isNowPlaying = false;
           movie.isPopular = false;
@@ -93,12 +109,12 @@ class MovieModelImpl extends MovieModel{
 
   @override
   Future<List<List<ActorVO>?>> getCreditsByMovie(int movieId) {
-      return _dataAgent.getCreditsByMovie(movieId);
+      return mDataAgent.getCreditsByMovie(movieId);
   }
 
   @override
   Future<MovieVO?> getMovieDetails(int movieId) {
-      return _dataAgent.getMovieDetails(movieId).then((movie){
+      return mDataAgent.getMovieDetails(movieId).then((movie){
           mMovieDao.saveSingleMovie(movie!);
           return Future.value(movie);
       });

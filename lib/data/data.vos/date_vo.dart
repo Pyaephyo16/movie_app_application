@@ -1,12 +1,13 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+
 import 'package:movie_app/persistance/hive_constants.dart';
 
 part 'date_vo.g.dart';
 
 @JsonSerializable()
 @HiveType(typeId: HIVE_TYPE_ID_DATE_VO,adapterName: "DateVOAdapter")
-class DateVO{
+class DateVO {
 
   @JsonKey(name: "maximum")
   @HiveField(0)
@@ -23,4 +24,16 @@ class DateVO{
 
   //object to json
   Map<String,dynamic> toJson() => _$DateVOToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+  
+    return other is DateVO &&
+      other.maximum == maximum &&
+      other.minimun == minimun;
+  }
+
+  @override
+  int get hashCode => maximum.hashCode ^ minimun.hashCode;
 }
